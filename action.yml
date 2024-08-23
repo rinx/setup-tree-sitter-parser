@@ -1,0 +1,52 @@
+name: 'Setup tree-sitter parser'
+description: 'Install tree-sitter cli and build parser'
+author: 'rinx'
+inputs:
+  parser_dir:
+    description: 'Directory to store built parser shared library'
+    default: './parser'
+  parser_repository:
+    description: 'Parser repository name to build'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Prepare
+      shell: bash
+      id: prepare
+      env:
+        TREE_SITTER_LIBDIR: ${{ inputs.parser_dir }}
+      run: |
+        mkdir -p ${TREE_SITTER_LIBDIR}
+        echo "libdir=$(realpath ${TREE_SITTER_LIBDIR})" >> $GITHUB_OUTPUT
+    - name: Install tree-sitter CLI
+      shell: bash
+      run: |
+        npm install -g tree-sitter-cli
+    - name: Verify tree-sitter CLI
+      shell: bash
+      run: |
+        tree-sitter --version
+    - name: Checkout 
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.parser_repository }}
+        path: /tmp/parser
+    - name: Build parser
+      shell: bash
+      working-directory: /tmp/parser
+      env:
+        TREE_SITTER_LIBDIR: ${{ steps.prepare.outputs.libdir }}
+      run: |
+        tree-sitter test || exit 0
+    - name: Verify parser dir
+      shell: bash
+      env:
+        TREE_SITTER_LIBDIR: ${{ steps.prepare.outputs.libdir }}
+      run: |
+        ls -l1 ${TREE_SITTER_LIBDIR}
+
+branding:
+  icon: 'check'
+  color: 'blue'

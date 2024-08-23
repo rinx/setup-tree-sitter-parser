@@ -1,0 +1,32 @@
+name: Test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-go-parser:
+    name: Build Go parser
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          parser_dir: ./parser
+          parser_repository: tree-sitter/tree-sitter-go
+      - name: Verify
+        run: |
+          ls -l ./parser/go.so
+  build-fennel-parser:
+    name: Build fennel parser
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          parser_dir: ./parser
+          parser_repository: alexmozaidze/tree-sitter-fennel
+      - name: Verify
+        run: |
+          ls -l ./parser/fennel.so
