@@ -20,6 +20,7 @@ runs:
       run: |
         mkdir -p ${TREE_SITTER_LIBDIR}
         echo "libdir=$(realpath ${TREE_SITTER_LIBDIR})" >> $GITHUB_OUTPUT
+        echo "tmpdir=$(mktemp -d tmp.XXXXXX)" >> $GITHUB_OUTPUT
     - name: Install tree-sitter CLI
       shell: bash
       run: |
@@ -32,14 +33,18 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: ${{ inputs.parser_repository }}
-        path: /tmp/parser
+        path: ${{ steps.prepare.outputs.tmpdir }}/parser
     - name: Build parser
       shell: bash
-      working-directory: /tmp/parser
+      working-directory: ${{ steps.prepare.outputs.tmpdir }}/parser
       env:
         TREE_SITTER_LIBDIR: ${{ steps.prepare.outputs.libdir }}
       run: |
         tree-sitter test || exit 0
+    - name: Delete tmpdir
+      shell: bash
+      run: |
+        rm -rf ${{ steps.prepare.outputs.tmpdir }}
     - name: Verify parser dir
       shell: bash
       env:
