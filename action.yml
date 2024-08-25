@@ -3,11 +3,14 @@ description: 'Install tree-sitter cli and build parser'
 author: 'rinx'
 inputs:
   parser_dir:
-    description: 'Directory to store built parser shared library'
+    description: 'Directory to store built parser shared library.'
     default: './parser'
   parser_repository:
-    description: 'Parser repository name to build'
+    description: 'Parser repository name to build.'
     required: true
+  parser_repository_ref:
+    description: 'The branch, tag or SHA to checkout parser repository.'
+    default: ''
 
 runs:
   using: 'composite'
@@ -33,6 +36,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: ${{ inputs.parser_repository }}
+        ref: ${{ inputs.parser_repository_ref }}
         path: ${{ steps.prepare.outputs.tmpdir }}/parser
     - name: Build parser
       shell: bash

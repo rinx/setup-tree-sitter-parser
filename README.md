@@ -15,6 +15,10 @@ The default is `./parser`.
 
 Parser repository name to build.
 
+### `parser_repository_ref`
+
+The branch, tag or SHA to checkout parser repository.
+
 ## Usage
 
 When using [reviewdog/action-ast-grep][reviewdog/action-ast-grep] for custom language, it is useful to build parser by using this action.
